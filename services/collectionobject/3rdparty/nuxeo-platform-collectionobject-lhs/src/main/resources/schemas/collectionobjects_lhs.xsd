@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+  CollectionObject schema (XSD)
+  
+  Entity  : CollectionObject
+  Part    : Local - Litchfield Historical Society
+  Used for: Nuxeo EP core document type
+-->
+
+<xs:schema 
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:ns="http://collectionspace.org/services/collectionobject/local/lhs"
+  xmlns="http://collectionspace.org/services/collectionobject/local/lhs"
+  targetNamespace="http://collectionspace.org/services/collectionobject/local/lhs"
+  version="0.1">
+
+    <xs:element name="category" type="xs:string"/>
+    <xs:element name="loanAllowed" type="xs:boolean"/>
+    <xs:element name="legalOwner" type="xs:string"/>
+    <xs:element name="provenance" type="xs:string"/>
+    <xs:element name="homeLocation" type="xs:string"/>
+    <xs:element name="culture" type="xs:string"/>
+    <xs:element name="signed" type="xs:boolean"/>
+    <xs:element name="wholePart" type="xs:string"/>
+    <xs:element name="legalStatus" type="xs:string"/>
+    <xs:element name="legalStatusDate" type="xs:date"/>
+</xs:schema>

@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+
+<component name="org.collectionspace.collectionobjects_lhs.layouts.webapp">
+
+    <extension target="org.nuxeo.ecm.platform.forms.layout.WebLayoutManager"
+    point="layouts">
+
+        <layout name="collectionobjects_lhs">
+        <!-- -->
+        </layout>
+    </extension>
+</component>
