@@ -20,9 +20,48 @@
     <xs:element name="legalOwner" type="xs:string"/>
     <xs:element name="provenance" type="xs:string"/>
     <xs:element name="homeLocation" type="xs:string"/>
-    <xs:element name="culture" type="xs:string"/>
+    <xs:element name="cultures">
+        <xs:complexType>
+              <xs:sequence>
+                  <xs:element name="culture" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+              </xs:sequence>
+        </xs:complexType>
+    </xs:element>
     <xs:element name="signed" type="xs:boolean"/>
-    <xs:element name="wholePart" type="xs:string"/>
     <xs:element name="legalStatus" type="xs:string"/>
     <xs:element name="legalStatusDate" type="xs:date"/>
+
+    <xs:element name="catalogingDateMade" type="xs:string"/>
+    <xs:element name="catalogingDateEarliestYear" type="xs:integer"/>
+    <xs:element name="catalogingDateLatestYear" type="xs:integer"/>
+    <xs:element name="catalogingDateCenturies">
+        <xs:complexType>
+              <xs:sequence>
+                  <xs:element name="catalogingDateCentury" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+              </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="catalogingDateNote" type="xs:string"/>
+
+    <xs:element name="objectInscriptionGroupList" type="ns:objectInscriptionGroupList"/>
+
+<!-- =================================================================
+     Inscription Group repeating structure
+     ================================================================= -->
+
+    <xs:complexType name="objectInscriptionGroupList">
+        <xs:sequence>
+            <xs:element name="objectInscriptionGroup" type="ns:objectInscriptionGroup" minOccurs="0"
+                maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="objectInscriptionGroup">
+        <xs:sequence>
+            <xs:element name="objectInscriptionType" type="xs:string"/>
+            <xs:element name="objectInscriptionText" type="xs:string"/>
+            <xs:element name="objectInscriptionLocation" type="xs:string"/>
+            <xs:element name="objectInscriptionNote" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
 </xs:schema>

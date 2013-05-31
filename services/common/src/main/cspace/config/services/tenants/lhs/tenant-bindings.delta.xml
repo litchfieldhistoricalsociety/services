@@ -20,16 +20,20 @@
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>
-                            <types:value>culture</types:value>
-                        </types:item>
-                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
-                            <types:key>termRef</types:key>
-                            <types:value>wholePart</types:value>
+                            <types:value>cultures|culture</types:value>
                         </types:item>
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>
                             <types:value>legalStatus</types:value>
                         </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
+                            <types:value>catalogingDateCenturies|catalogingDateCentury</types:value>
+                        </types:item>
+                        <!--types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
+                            <types:value>objectInscriptionGroupList/*/objectInscriptionType</types:value>
+                        </types:item-->
                     </service:properties>
                     <service:content contentType="application/xml">
                         <service:xmlContent namespaceURI="http://collectionspace.org/services/collectionobject/local/lhs" schemaLocation="http://collectionspace.org/services/collectionobject/local/lhs http://collectionspace.org/services/collectionobject/local/collectionobjects_lhs.xsd" />
