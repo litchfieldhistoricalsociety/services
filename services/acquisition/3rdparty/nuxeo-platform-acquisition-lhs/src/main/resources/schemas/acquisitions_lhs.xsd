@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    Acquisition schema (XSD)
+    
+    Entity  : Acquisition
+    Part    : Local - Litchfield Historical Society
+    Used for: Nuxeo EP core document type
+-->
+
+<xs:schema 
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:ns="http://collectionspace.org/services/acquisition/local/lhs"
+    xmlns="http://collectionspace.org/services/acquisition/local/lhs"
+    targetNamespace="http://collectionspace.org/services/acquisition/local/lhs"
+    version="0.1">
+
+    <xs:element name="acquisitionCostCurrency" type="xs:string"/>
+    <xs:element name="acquisitionCostValue" type="xs:decimal"/>
+
+    <xs:element name="acquisitionPriceCurrency" type="xs:string"/>
+    <xs:element name="acquisitionPriceValue" type="xs:decimal"/>
+</xs:schema>
