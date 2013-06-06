@@ -42,6 +42,68 @@
 
             </service:object>
         </tenant:serviceBindings>
+
+        <tenant:serviceBindings merge:matcher="id" id="Conditionchecks">
+            <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service" merge:matcher="tag" merge:action="replace">
+                <service:params>
+                    <service:ListResultsFields>
+                        <service:ListResultField>
+                            <service:element>conditionCheckRefNumber</service:element>
+                            <service:xpath>conditionCheckRefNumber</service:xpath>
+                        </service:ListResultField>
+                        <service:ListResultField merge:matcher="skip" merge:action="insert">
+                            <service:element>conditionLHS</service:element>
+                            <service:schema>conditionchecks_lhs</service:schema>
+                            <service:xpath>conditionLHS</service:xpath>
+                        </service:ListResultField>
+                        <service:ListResultField merge:matcher="skip" merge:action="insert">
+                            <service:element>conditionDateLHS</service:element>
+                            <service:schema>conditionchecks_lhs</service:schema>
+                            <service:xpath>conditionDateLHS</service:xpath>
+                        </service:ListResultField>
+                    </service:ListResultsFields>
+                </service:params>
+            </service:DocHandlerParams>
+            <service:properties xmlns:service="http://collectionspace.org/services/config/service" merge:matcher="tag" merge:action="replace">
+                <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                    <types:key>objectNameProperty</types:key>
+                    <types:value>conditionLHS</types:value>
+                </types:item>
+                <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                    <types:key>objectNumberProperty</types:key>
+                    <types:value>conditionCheckRefNumber</types:value>
+                </types:item>
+            </service:properties>
+            <service:object xmlns:service="http://collectionspace.org/services/config/service" >
+                <service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="conditionchecks_lhs" updated="" order="3">
+                    <service:properties>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>authorizedBy</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>workBy</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
+                            <types:value>conditionLHS</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
+                            <types:value>estimatedCostCurrency</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>termRef</types:key>
+                            <types:value>activityCostCurrency</types:value>
+                        </types:item>
+                    </service:properties>
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/services/conditioncheck/local/lhs" schemaLocation="http://collectionspace.org/services/conditioncheck/local/lhs http://collectionspace.org/services/conditioncheck/local/conditionchecks_lhs.xsd" />
+                     </service:content>
+                </service:part>
+            </service:object>
+        </tenant:serviceBindings>
         
         <tenant:serviceBindings merge:matcher="id" id="Acquisitions">
             <service:object xmlns:service="http://collectionspace.org/services/config/service" >

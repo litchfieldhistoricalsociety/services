@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    Condition check schema (XSD)
+    
+    Entity  : Conditioncheck
+    Part    : Local - Litchfield Historical Society
+    Used for: Nuxeo EP core document type
+
+-->
+
+<xs:schema 
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:ns="http://collectionspace.org/services/conditioncheck/local/lhs"
+    xmlns="http://collectionspace.org/services/conditioncheck/local/lhs"
+    targetNamespace="http://collectionspace.org/services/conditioncheck/local/lhs"
+    version="0.1">
+
+    <!--  Object Condition and Technical Assessment Information Group -->
+    <xs:element name="conditionLHS" type="xs:string"/>
+    <xs:element name="conditionDateLHS" type="xs:date"/>
+    <xs:element name="conditionSummaryLHS" type="xs:string"/>
+    <xs:element name="conditionNoteLHS" type="xs:string"/>
+    <xs:element name="examinationFlag" type="xs:boolean"/>
+    <xs:element name="treatmentFlag" type="xs:boolean"/>
+    <xs:element name="damageFlag" type="xs:boolean"/>
+    <xs:element name="preparationFlag" type="xs:boolean"/>
+    <xs:element name="priorityTreatmentFlag" type="xs:boolean"/>
+    <xs:element name="priorityCuratorialFlag" type="xs:boolean"/>
+
+    <!--  Condition Check and Technical Assessment Information Group -->
+    <xs:element name="activity" type="xs:string"/>
+    <xs:element name="activityStartDate" type="xs:date"/>
+    <xs:element name="activityEndDate" type="xs:date"/>
+    <xs:element name="activityReason" type="xs:string"/>
+    <xs:element name="activitySummary" type="xs:string"/>
+    <xs:element name="authorizedBy" type="xs:string"/>
+    <xs:element name="workBy" type="xs:string"/>
+    <xs:element name="estimatedTime" type="xs:decimal"/>
+    <xs:element name="estimatedCost" type="xs:decimal"/>
+    <xs:element name="estimatedCostCurrency" type="xs:string"/>
+    <xs:element name="activityTime" type="xs:decimal"/>
+    <xs:element name="activityCost" type="xs:decimal"/>
+    <xs:element name="activityCostCurrency" type="xs:string"/>
+
+</xs:schema>

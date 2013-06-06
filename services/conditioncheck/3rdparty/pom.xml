@@ -18,7 +18,16 @@
         3rd party build for conditioncheck service
     </description>
 
+    <properties>
+        <ServiceName>conditioncheck</ServiceName>
+        <NuxeoDocTypeName>Conditioncheck</NuxeoDocTypeName>   
+        <CommonSchemaName>conditionchecks_common</CommonSchemaName>
+        <TenantPrefix>Tenant</TenantPrefix>
+        <Lifecycle>cs_default</Lifecycle>
+    </properties>
+
     <modules>
         <module>nuxeo-platform-cs-conditioncheck</module>
+        <module>nuxeo-platform-conditioncheck-lhs</module>
     </modules>
 </project>
