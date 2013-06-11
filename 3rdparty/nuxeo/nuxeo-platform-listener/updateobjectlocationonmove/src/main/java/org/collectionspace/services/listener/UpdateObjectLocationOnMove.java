@@ -39,7 +39,11 @@ public class UpdateObjectLocationOnMove extends AbstractUpdateObjectLocationValu
         //
         // * If it is not blank ...
         // * Is then capable of being successfully parsed by an authority item parser.
-        if (Tools.notBlank(currentLocationRefName)
+        //
+        // Commenting out this simple check, which was blocking a non-refName formatted currentLocation field
+        // for the LHS tenant.
+        //
+        /*if (Tools.notBlank(currentLocationRefName)
                 && RefNameUtils.parseAuthorityTermInfo(currentLocationRefName) == null) {
             logger.warn("Could not parse current location refName '" + currentLocationRefName + "'");
             return collectionObjectDocModel;
@@ -48,7 +52,7 @@ public class UpdateObjectLocationOnMove extends AbstractUpdateObjectLocationValu
                 logger.trace("current location refName passes basic validation tests.");
                 logger.trace("currentLocation refName=" + currentLocationRefName);
             }
-        }
+        }*/
         
         // Get the computed current location value of the CollectionObject
         // (the "existing" value)
