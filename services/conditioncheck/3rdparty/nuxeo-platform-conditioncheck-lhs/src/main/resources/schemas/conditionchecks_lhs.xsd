@@ -32,8 +32,6 @@
     <xs:element name="activityEndDate" type="xs:date"/>
     <xs:element name="activityReason" type="xs:string"/>
     <xs:element name="activitySummary" type="xs:string"/>
-    <xs:element name="authorizedBy" type="xs:string"/>
-    <xs:element name="workBy" type="xs:string"/>
     <xs:element name="estimatedTime" type="xs:decimal"/>
     <xs:element name="estimatedCost" type="xs:decimal"/>
     <xs:element name="estimatedCostCurrency" type="xs:string"/>
