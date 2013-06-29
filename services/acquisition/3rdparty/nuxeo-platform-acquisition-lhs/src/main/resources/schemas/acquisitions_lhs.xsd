@@ -18,6 +18,22 @@
     <xs:element name="acquisitionCostCurrency" type="xs:string"/>
     <xs:element name="acquisitionCostValue" type="xs:decimal"/>
 
-    <xs:element name="acquisitionPriceCurrency" type="xs:string"/>
-    <xs:element name="acquisitionPriceValue" type="xs:decimal"/>
+    <xs:element name="acquisitionAppraisalCurrency" type="xs:string"/>
+    <xs:element name="acquisitionAppraisalValue" type="xs:decimal"/>
+    <xs:element name="acquisitionAppraisalDate" type="xs:date"/>
+    <xs:element name="acquisitionAppraiser" type="xs:string"/>
+
+    <!-- Object Donor's Contribution Information -->
+    <!-- copied from CatalogingObject schema with modifications -->
+    <xs:element name="donor" type="xs:string"/>
+    <xs:element name="donorsPersonalExperience" type="xs:string"/>
+    <xs:element name="donorsPersonalResponse" type="xs:string"/>
+    <xs:element name="donorsReferences">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="donorsReference" type="xs:string" minOccurs="0" maxOccurs="unbounded"/>
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+    <xs:element name="donorsContributionNote" type="xs:string"/>
 </xs:schema>
