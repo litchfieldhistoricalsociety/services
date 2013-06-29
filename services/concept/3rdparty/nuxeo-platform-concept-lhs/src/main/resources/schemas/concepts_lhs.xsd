@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+
+<!--
+    Concept schema (XSD)
+    
+    Entity  : Concept
+    Part    : Local - Litchfield Historical Society
+    Used for: Nuxeo EP core document type
+-->
+
+<xs:schema 
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:ns="http://collectionspace.org/services/concept/local/lhs"
+    xmlns="http://collectionspace.org/services/concept/local/lhs"
+    targetNamespace="http://collectionspace.org/services/concept/local/lhs"
+    version="0.1">
+    <!-- See http://wiki.collectionspace.org/display/collectionspace/Concept+Service+Home -->
+
+    <xs:element name="conceptNote" type="xs:string"/>
+</xs:schema>

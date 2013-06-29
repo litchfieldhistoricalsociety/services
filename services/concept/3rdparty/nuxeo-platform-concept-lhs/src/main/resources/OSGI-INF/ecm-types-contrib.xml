@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<component name="org.collectionspace.concept.lhs.ecm.types">
+  <extension target="org.nuxeo.ecm.platform.types.TypeService" point="types">
+    <type id="ConceptitemTenant8" coretype="ConceptitemTenant8">
+      <label>org.collectionspace.ConceptitemTenant8</label>
+      <!--icon>/icons/file.gif</icon-->
+      <default-view>view_documents</default-view>
+
+      <layouts mode="any">
+        <layout>heading</layout>
+        <layout>collectionspace_core</layout>
+        <layout>concept</layout>
+        <layout>concepts_lhs</layout>
+      </layouts>
+    </type>
+
+    <type id="Folder" coretype="Folder">
+      <subtypes>
+        <type>ConceptitemTenant8</type>
+      </subtypes>
+    </type>
+    
+    <type id="Workspace" coretype="Workspace">
+      <subtypes>
+        <type>ConceptitemTenant8</type>
+      </subtypes>
+    </type>
+  </extension>
+</component>

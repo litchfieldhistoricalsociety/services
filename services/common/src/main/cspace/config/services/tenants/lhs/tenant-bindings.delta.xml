@@ -105,6 +105,16 @@
                 </service:part>
             </service:object>
         </tenant:serviceBindings>
+
+        <tenant:serviceBindings merge:matcher="id" id="Concepts">
+            <service:object xmlns:service="http://collectionspace.org/services/config/service" >
+                <service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="concepts_lhs" updated="" order="3">
+                    <service:content contentType="application/xml">
+                        <service:xmlContent namespaceURI="http://collectionspace.org/services/concept/local/lhs" schemaLocation="http://collectionspace.org/services/concept/local/lhs http://collectionspace.org/services/concept/local/concepts_lhs.xsd" />
+                     </service:content>
+                </service:part>
+            </service:object>
+        </tenant:serviceBindings>
         
         <tenant:serviceBindings merge:matcher="id" id="Acquisitions">
             <service:object xmlns:service="http://collectionspace.org/services/config/service" >
