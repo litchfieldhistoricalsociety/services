@@ -24,6 +24,10 @@
                 <service:part id="3" merge:matcher="skip" merge:action="insert" control_group="Managed" versionable="true" auditable="false" label="collectionobjects_lhs" updated="" order="3">
                     <service:properties>
                         <types:item xmlns:types="http://collectionspace.org/services/config/types">
+                            <types:key>authRef</types:key>
+                            <types:value>formerOwner</types:value>
+                        </types:item>
+                        <types:item xmlns:types="http://collectionspace.org/services/config/types">
                             <types:key>termRef</types:key>
                             <types:value>legalOwner</types:value>
                         </types:item>

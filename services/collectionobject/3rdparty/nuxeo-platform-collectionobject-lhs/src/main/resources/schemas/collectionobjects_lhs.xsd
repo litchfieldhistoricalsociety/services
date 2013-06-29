@@ -45,6 +45,8 @@
 
     <xs:element name="objectInscriptionGroupList" type="ns:objectInscriptionGroupList"/>
 
+    <xs:element name="formerOwnerGroupList" type="ns:formerOwnerGroupList"/>
+
 <!-- =================================================================
      Inscription Group repeating structure
      ================================================================= -->
@@ -61,6 +63,24 @@
             <xs:element name="objectInscriptionText" type="xs:string"/>
             <xs:element name="objectInscriptionLocation" type="xs:string"/>
             <xs:element name="objectInscriptionNote" type="xs:string"/>
+        </xs:sequence>
+    </xs:complexType>
+
+<!-- =================================================================
+     Former Owner Group repeating structure
+     ================================================================= -->
+
+    <xs:complexType name="formerOwnerGroupList">
+        <xs:sequence>
+            <xs:element name="formerOwnerGroup" type="ns:formerOwnerGroup" minOccurs="0"
+                maxOccurs="unbounded"/>
+        </xs:sequence>
+    </xs:complexType>
+    <xs:complexType name="formerOwnerGroup">
+        <xs:sequence>
+            <xs:element name="formerOwner" type="xs:string"/>
+            <xs:element name="formerOwnerDate" type="xs:date"/>
+            <xs:element name="formerOwnerPlace" type="xs:string"/>
         </xs:sequence>
     </xs:complexType>
 
