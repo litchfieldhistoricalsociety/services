@@ -7,6 +7,38 @@
         <tenant:repositoryDomain name="default-domain" storageName="lhs-domain" repositoryClient="nuxeo-java" />
 
         <tenant:serviceBindings merge:matcher="id" id="CollectionObjects">
+            <service:DocHandlerParams xmlns:service="http://collectionspace.org/services/config/service" merge:matcher="tag" merge:action="replace">
+                <service:params>
+                    <service:SupportsHierarchy>true</service:SupportsHierarchy>
+                    <service:RefnameDisplayNameField> <!-- The field used as the display name in an object's refname -->
+                        <service:element>objectNumber</service:element>
+                        <service:xpath>objectNumber</service:xpath>
+                    </service:RefnameDisplayNameField>
+                    <service:ListResultsFields>
+                        <service:ListResultField>
+                            <service:element>objectNumber</service:element>
+                            <service:xpath>objectNumber</service:xpath>
+                        </service:ListResultField>
+                        <service:ListResultField>
+                            <service:element>objectName</service:element>
+                            <service:xpath>objectNameList/[0]/objectName</service:xpath>
+                        </service:ListResultField>
+                        <service:ListResultField>
+                            <service:element>objectProductionPlace</service:element>
+                            <service:xpath>objectProductionPlaceGroupList/[0]/objectProductionPlace</service:xpath>
+                        </service:ListResultField>
+                        <service:ListResultField>
+                            <service:element>objectProductionPerson</service:element>
+                            <service:xpath>objectProductionPersonGroupList/[0]/objectProductionPerson</service:xpath>
+                        </service:ListResultField>
+                        <service:ListResultField>
+                            <service:element>catalogingDateMade</service:element>
+                            <service:schema>collectionobjects_lhs</service:schema>
+                            <service:xpath>catalogingDateMade</service:xpath>
+                        </service:ListResultField>
+                    </service:ListResultsFields>
+                </service:params>
+            </service:DocHandlerParams>
             <service:object xmlns:service="http://collectionspace.org/services/config/service" >
                 <service:part id="1" control_group="Managed" versionable="true" auditable="false" label="collectionobjects_common" updated="" order="1" merge:matcher="id" merge:action="merge">
                     <service:properties>
