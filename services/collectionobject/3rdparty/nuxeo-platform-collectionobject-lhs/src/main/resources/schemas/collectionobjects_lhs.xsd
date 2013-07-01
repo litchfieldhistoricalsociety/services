@@ -32,8 +32,8 @@
     <xs:element name="legalStatusDate" type="xs:date"/>
 
     <xs:element name="catalogingDateMade" type="xs:string"/>
-    <xs:element name="catalogingDateEarliestYear" type="xs:integer"/>
-    <xs:element name="catalogingDateLatestYear" type="xs:integer"/>
+    <xs:element name="catalogingDateEarliestYear" type="xs:date"/>
+    <xs:element name="catalogingDateLatestYear" type="xs:date"/>
     <xs:element name="catalogingDateCenturies">
         <xs:complexType>
               <xs:sequence>
