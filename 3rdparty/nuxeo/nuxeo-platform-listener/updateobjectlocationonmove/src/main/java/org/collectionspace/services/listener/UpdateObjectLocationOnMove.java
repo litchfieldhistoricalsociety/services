@@ -38,7 +38,11 @@ public class UpdateObjectLocationOnMove extends AbstractUpdateObjectLocationValu
         //
         // * Is not blank
         // * Is capable of being successfully parsed by an authority item parser.
-        if (Tools.isBlank(currentLocationRefName)) {
+        //
+        // Commenting out this simple check, which was blocking a non-refName formatted currentLocation field
+        // for the LHS tenant.
+        //
+        /*if (Tools.isBlank(currentLocationRefName)) {
             if (logger.isTraceEnabled()) {
                 logger.trace("Current location in Movement record was blank");
             }
@@ -52,7 +56,7 @@ public class UpdateObjectLocationOnMove extends AbstractUpdateObjectLocationValu
                 logger.trace("current location refName passes basic validation tests.");
                 logger.trace("currentLocation refName=" + currentLocationRefName);
             }
-        }
+        }*/
         
         // Get the computed current location value of the CollectionObject
         // (the "existing" value)
