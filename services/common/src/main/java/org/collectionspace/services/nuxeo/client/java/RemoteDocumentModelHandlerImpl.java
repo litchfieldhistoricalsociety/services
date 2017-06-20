@@ -79,13 +79,10 @@ import org.collectionspace.services.relation.RelationsCommon;
 import org.collectionspace.services.relation.RelationsCommonList;
 import org.collectionspace.services.relation.RelationsDocListItem;
 import org.collectionspace.services.relation.RelationshipType;
-
 import org.dom4j.Element;
-
 import org.nuxeo.ecm.core.api.DocumentModel;
 import org.nuxeo.ecm.core.api.DocumentModelList;
 import org.nuxeo.ecm.core.api.model.PropertyException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -193,11 +190,10 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
     	return result;
     }
     
-
 	@Override
-	public void handleWorkflowTransition(DocumentWrapper<DocumentModel> wrapDoc, TransitionDef transitionDef)
+	public void handleWorkflowTransition(ServiceContext ctx, DocumentWrapper<DocumentModel> wrapDoc, TransitionDef transitionDef)
 			throws Exception {
-		// Do nothing by default, but children can override if they want.  The real workflow transition happens in the WorkflowDocumemtModelHandler class
+		// Do nothing by default, but children can override if they want.  The real workflow transition happens in the WorkflowDocumentModelHandler class
 	}
     	
     @Override
@@ -393,8 +389,8 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
         DocumentModel docModel = wrapDoc.getWrappedObject();
         MultipartServiceContext ctx = (MultipartServiceContext) getServiceContext();
         PoxPayloadIn input = ctx.getInput();
-        if (input.getParts().isEmpty()) {
-            String msg = "No payload found!";
+        if (input == null || input.getParts().isEmpty()) {
+            String msg = String.format("No payload found for '%s' action.", action);
             logger.error(msg + "Ctx=" + getServiceContext().toString());
             throw new BadRequestException(msg);
         }
@@ -418,8 +414,7 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
                 continue;
             }
             fillPart(part, docModel, partMeta, action, ctx);
-        }//rof
-
+        }
     }
 
     /**
@@ -547,7 +542,7 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
     	String returnValue = null;
 
     	try{ 
-    		RepositoryJavaClientImpl repoClient = (RepositoryJavaClientImpl)this.getRepositoryClient(ctx);
+    		RepositoryClientImpl repoClient = (RepositoryClientImpl)this.getRepositoryClient(ctx);
     		repoSession = this.getRepositorySession();
     		if (repoSession == null) {
     			repoSession = repoClient.getRepositorySession();
@@ -619,7 +614,7 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
         	
         	boolean releaseRepoSession = false;
         	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = this.getServiceContext();
-        	RepositoryJavaClientImpl repoClient = (RepositoryJavaClientImpl)this.getRepositoryClient(ctx);
+        	RepositoryClientImpl repoClient = (RepositoryClientImpl)this.getRepositoryClient(ctx);
         	CoreSessionInterface repoSession = this.getRepositorySession();
         	if (repoSession == null) {
         		repoSession = repoClient.getRepositorySession(ctx);
@@ -1179,7 +1174,7 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
      *
      */
     private RelationsCommonList updateRelations(
-            String itemCSID, PoxPayloadIn input, DocumentWrapper<DocumentModel> wrapDoc, boolean fUpdate)
+            String itemCSID, PoxPayloadIn input, DocumentWrapper<DocumentModel> wrapDoc, boolean forUpdate)
             throws Exception {
         if (logger.isTraceEnabled()) {
             logger.trace("AuthItemDocHndler.updateRelations for: " + itemCSID);
@@ -1201,11 +1196,11 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
         //Do magic replacement of ${itemCSID} and fix URI's.
         fixupInboundListItems(ctx, inboundList, docModel, itemCSID);
 
-        String HAS_BROADER = RelationshipType.HAS_BROADER.value();
+        final String HAS_BROADER = RelationshipType.HAS_BROADER.value();
         UriInfo uriInfo = ctx.getUriInfo();
         MultivaluedMap<String, String> queryParams = uriInfo.getQueryParameters();
 
-        if (fUpdate) {
+        if (forUpdate) {
             //Run getList() once as sent to get childListOuter:
             String predicate = RelationshipType.HAS_BROADER.value();
             queryParams.putSingle(IRelationsManager.PREDICATE_QP, predicate);
@@ -1263,7 +1258,7 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
             			String newChildCsid = inboundItem.getSubject().getCsid();
             			if(newChildCsid == null) {
             				String newChildRefName = inboundItem.getSubject().getRefName();
-            				if(newChildRefName==null) {
+            				if (newChildRefName == null) {
             					throw new RuntimeException("Child with no CSID or refName!");
             				}
                             if (logger.isTraceEnabled()) {
@@ -1298,7 +1293,7 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
             String dump = dumpLists(itemCSID, parentList, childList, actionList);
             logger.trace("~~~~~~~~~~~~~~~~~~~~~~dump~~~~~~~~~~~~~~~~~~~~~~~~" + CR + dump);
         }
-        if (fUpdate) {
+        if (forUpdate) {
             if (logger.isTraceEnabled()) {
                 logger.trace("AuthItemDocHndler.updateRelations for: " + itemCSID + " deleting "
                         + parentList.size() + " existing parents and " + childList.size() + " existing children.");
@@ -1314,7 +1309,7 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
         if (logger.isTraceEnabled()) {
             logger.trace("AuthItemDocHndler.updateRelations for: " + itemCSID + " done.");
         }
-        //We return all elements on the inbound list, since we have just worked to make them exist in the system
+        // We return all elements on the inbound list, since we have just worked to make them exist in the system
         // and be non-redundant, etc.  That list came from relationsCommonListBody, so it is still attached to it, just pass that back.
         return relationsCommonListBody;
     }
@@ -1409,14 +1404,14 @@ public abstract class   RemoteDocumentModelHandlerImpl<T, TL>
     // Nevertheless, we should complete the item save before we do work on the relations, especially
     // since a save on Create might fail, and we would not want to create relations for something
     // that may not be created...
-    private void handleRelationsPayload(DocumentWrapper<DocumentModel> wrapDoc, boolean fUpdate) throws Exception {
+    private void handleRelationsPayload(DocumentWrapper<DocumentModel> wrapDoc, boolean forUpdate) throws Exception {
     	ServiceContext<PoxPayloadIn, PoxPayloadOut> ctx = getServiceContext();
         PoxPayloadIn input = ctx.getInput();
         DocumentModel documentModel = (wrapDoc.getWrappedObject());
         String itemCsid = documentModel.getName();
 
         //Updates relations part
-        RelationsCommonList relationsCommonList = updateRelations(itemCsid, input, wrapDoc, fUpdate);
+        RelationsCommonList relationsCommonList = updateRelations(itemCsid, input, wrapDoc, forUpdate);
 
         PayloadOutputPart payloadOutputPart = new PayloadOutputPart(RelationClient.SERVICE_COMMON_LIST_NAME, relationsCommonList);  //FIXME: REM - We should check for a null relationsCommonList and not create the new common list payload
         ctx.setProperty(RelationClient.SERVICE_COMMON_LIST_NAME, payloadOutputPart);

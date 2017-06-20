@@ -25,11 +25,24 @@ package org.collectionspace.services.client.test;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.List;
+
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 //import org.collectionspace.services.client.AbstractServiceClientImpl;
-import org.collectionspace.services.client.AbstractCommonListUtils;
 import org.collectionspace.services.client.CollectionObjectClient;
 import org.collectionspace.services.client.CollectionObjectFactory;
 import org.collectionspace.services.client.CollectionSpaceClient;
@@ -49,14 +62,9 @@ import org.collectionspace.services.collectionobject.OtherNumber;
 import org.collectionspace.services.collectionobject.ResponsibleDepartmentList;
 import org.collectionspace.services.collectionobject.TitleGroup;
 import org.collectionspace.services.collectionobject.TitleGroupList;
-import org.collectionspace.services.collectionobject.TitleTranslationSubGroup;
-import org.collectionspace.services.collectionobject.TitleTranslationSubGroupList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
-
-import org.jboss.resteasy.client.ClientResponse;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -99,9 +107,14 @@ public class CollectionObjectServiceTest extends AbstractPoxServiceTestImpl<Abst
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
     @Override
-    protected CollectionSpaceClient getClientInstance() {
+    protected CollectionSpaceClient getClientInstance() throws Exception {
     	return new CollectionObjectClient();
     }
+
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
+    	return new CollectionObjectClient(clientPropertiesFilename);
+	}
      
     // ---------------------------------------------------------------
     // CRUD tests : CREATE tests
@@ -533,8 +546,9 @@ public class CollectionObjectServiceTest extends AbstractPoxServiceTestImpl<Abst
      * @param testName the test name
      * @param id the id
      * @return the client response
+     * @throws Exception 
      */
-    private Response updateRetrieve(String testName, String id) {
+    private Response updateRetrieve(String testName, String id) throws Exception {
         setupRead();
         CollectionObjectClient client = new CollectionObjectClient();
         Response res = client.read(knownResourceId);
@@ -560,9 +574,10 @@ public class CollectionObjectServiceTest extends AbstractPoxServiceTestImpl<Abst
      * @param testName the test name
      * @param id the id
      * @return the client response
+     * @throws Exception 
      */
     private Response updateSend(String testName, String id,
-            CollectionobjectsCommon collectionObjectCommon) {
+            CollectionobjectsCommon collectionObjectCommon) throws Exception {
         setupUpdate();
         PoxPayloadOut output = new PoxPayloadOut(CollectionObjectClient.SERVICE_PAYLOAD_NAME);
         PayloadOutputPart commonPart = output.addPart(collectionObjectCommon, MediaType.APPLICATION_XML_TYPE);
@@ -858,7 +873,7 @@ public class CollectionObjectServiceTest extends AbstractPoxServiceTestImpl<Abst
     // Utility methods used by tests above
     // ---------------------------------------------------------------
         
-    private Response newCollectionObject() {
+    private Response newCollectionObject() throws Exception {
     	Response result = null;
     	
         CollectionObjectClient client = new CollectionObjectClient();
@@ -870,7 +885,7 @@ public class CollectionObjectServiceTest extends AbstractPoxServiceTestImpl<Abst
         return result;
     }
     
-    private String newCollectionObject(boolean assertStatus) {
+    private String newCollectionObject(boolean assertStatus) throws Exception {
     	String result = null;
     	
     	Response res = newCollectionObject();

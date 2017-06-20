@@ -18,6 +18,7 @@ import javax.sql.DataSource;
 
 import org.apache.tomcat.dbcp.dbcp.BasicDataSource;
 import org.collectionspace.authentication.AuthN;
+import org.collectionspace.services.client.XmlTools;
 import org.collectionspace.services.common.api.JEEServerDeployment;
 import org.collectionspace.services.common.api.FileTools;
 import org.collectionspace.services.common.api.Tools;
@@ -55,7 +56,19 @@ import org.slf4j.LoggerFactory;
  */
 public class ServiceMain {
 
-    final Logger logger = LoggerFactory.getLogger(ServiceMain.class);
+    final static Logger logger = LoggerFactory.getLogger(ServiceMain.class);
+    
+    /**
+     * For some reason, we have trouble getting logging from this class directed to
+     * the tomcat/catalina console log file.  So we do it explicitly with this method.
+     * 
+     * @param str
+     */
+    private static void mirrorToStdOut(String str) {
+    	System.out.println(str);
+    	ServiceMain.logger.info(str);
+    }
+
     /**
      * volatile is used here to assume about ordering (post JDK 1.5)
      */
@@ -179,21 +192,24 @@ public class ServiceMain {
         //
         if (getClientType().equals(ClientType.JAVA)) {
             nuxeoConnector = NuxeoConnectorEmbedded.getInstance();
+            mirrorToStdOut("\nStarting Nuxeo platform...");
             nuxeoConnector.initialize(
             		getServerRootDir(),
             		getServicesConfigReader().getConfiguration().getRepositoryClient(),
             		ServiceMain.servletContext);
+            mirrorToStdOut("Nuxeo platform started successfully.\n");
         } else {
         	//
         	// Exit if we don't have the correct/known client type
         	//
         	throw new RuntimeException("Unknown CollectionSpace services client type: " + getClientType());
         }
+                
         //
         // Create all the default user accounts and permissions.  Since some of our "cspace" database config files
         // for Spring need to be created at build time, the "cspace" database already will be suffixed with the
         // correct 'cspaceInstanceId' so we don't need to pass it to the JDBCTools methods.
-        //
+        //        
 		try {
 			AuthorizationCommon.createDefaultWorkflowPermissions(tenantBindingConfigReader);
 			String cspaceDatabaseName = getCspaceDatabaseName();
@@ -215,8 +231,42 @@ public class ServiceMain {
         	logger.error("handlePostNuxeoInitDBTasks failed with exception(s): " + e.getLocalizedMessage(), e);
         }
         */
+		showTenantStatus();
     }
-
+    
+    private void showTenantStatus() {
+    	Hashtable<String,TenantBindingType> tenantBindingsList = tenantBindingConfigReader.getTenantBindings(true);
+    	mirrorToStdOut("++++++++++++++++ Summary - CollectionSpace tenant status. ++++++++++++++++++++++++");
+    	String headerTemplate = "%10s %10s %30s %60s %10s";
+    	String headerUnderscore = String.format(headerTemplate,
+    			"______",
+    			"__",
+    			"____",
+    			"____________",
+    			"_______");
+    	String header = String.format(headerTemplate,
+    			"Status",
+    			"ID",
+    			"Name",
+    			"Display Name",
+    			"Version");
+    	mirrorToStdOut(header);
+    	mirrorToStdOut(headerUnderscore);
+    			
+    	for (String tenantId : tenantBindingsList.keySet()) {
+    		TenantBindingType tenantBinding = tenantBindingsList.get(tenantId);
+    		String statusLine = String.format(headerTemplate,
+    				tenantBinding.isCreateDisabled() ? "Disabled" : "Active",
+    				tenantBinding.getId(),
+    				tenantBinding.getName(),
+    				tenantBinding.getDisplayName(),
+    				tenantBinding.getVersion());
+    		mirrorToStdOut(statusLine);
+    	}
+    	// footer
+    	mirrorToStdOut("++++++++++++++++ ........................................ ++++++++++++++++++++++++");
+    }
+    
     /**
      * release releases all resources occupied by service layer infrastructure
      * but not necessarily those occupied by individual services
@@ -338,8 +388,8 @@ public class ServiceMain {
                     if (Tools.isEmpty(initHandlerClassname)) {
                         continue;
                     }
-                    if (logger.isInfoEnabled()) {
-                        logger.info(String.format("Firing post-init handler %s ...", initHandlerClassname));
+                    if (ServiceMain.logger.isDebugEnabled()) {
+                    	ServiceMain.logger.debug(String.format("Firing post-init handler %s ...", initHandlerClassname));
                     }
 
                     List<org.collectionspace.services.config.service.InitHandler.Params.Field>
@@ -508,41 +558,42 @@ public class ServiceMain {
 
         // First check and create the roles as needed. (nuxeo and reader)
         for (TenantBindingType tenantBinding : tenantBindings.values()) {
-                String tId = tenantBinding.getId();
-                String tName = tenantBinding.getName();
-                List<RepositoryDomainType> repoDomainList = tenantBinding.getRepositoryDomain();
-                for (RepositoryDomainType repoDomain : repoDomainList) {
-                        String repoDomainName = repoDomain.getName();
-                        String repositoryName = repoDomain.getRepositoryName();
-                        String cspaceInstanceId = getCspaceInstanceId();
-                        String dbName = JDBCTools.getDatabaseName(repositoryName, cspaceInstanceId);
-                        if (nuxeoDBsChecked.contains(dbName)) {
-                                if (logger.isDebugEnabled()) {
-                                        logger.debug("Another user of db: " + dbName + ": Repo: " + repoDomainName
-                                                        + " and tenant: " + tName + " (id:" + tId + ")");
-                                }
-                        } else {
-                                if (logger.isDebugEnabled()) {
-                                        logger.debug("Need to prepare db: " + dbName + " for Repo: " + repoDomainName
-                                                        + " and tenant: " + tName + " (id:" + tId + ")");
-                                }
-                                boolean dbExists = JDBCTools.hasDatabase(dbType, dbName);
-                                if (dbExists) {
-                                        if (logger.isDebugEnabled()) {
-                                                logger.debug("Database: " + dbName + " already exists.");
-                                        }
-                                } else {
-                                        // Create the user as needed
-                                        JDBCTools.createNewDatabaseUser(JDBCTools.CSADMIN_DATASOURCE_NAME, repositoryName, cspaceInstanceId, dbType, nuxeoUser, nuxeoPW);
-                                        if (readerUser != null) {
-                                            JDBCTools.createNewDatabaseUser(JDBCTools.CSADMIN_DATASOURCE_NAME, repositoryName, cspaceInstanceId, dbType, readerUser, readerPW);
-                                        }
-                                        // Create the database
-                                        createDatabaseWithRights(dbType, dbName, nuxeoUser, nuxeoPW, readerUser, readerPW);
-                                }
-                                nuxeoDBsChecked.add(dbName);
+            String tId = tenantBinding.getId();
+            String tName = tenantBinding.getName();
+            
+            List<RepositoryDomainType> repoDomainList = tenantBinding.getRepositoryDomain();
+            for (RepositoryDomainType repoDomain : repoDomainList) {
+                String repoDomainName = repoDomain.getName();
+                String repositoryName = repoDomain.getRepositoryName();
+                String cspaceInstanceId = getCspaceInstanceId();
+                String dbName = JDBCTools.getDatabaseName(repositoryName, cspaceInstanceId);
+                if (nuxeoDBsChecked.contains(dbName)) {
+                    if (logger.isDebugEnabled()) {
+                            logger.debug("Another user of db: " + dbName + ": Repo: " + repoDomainName
+                                            + " and tenant: " + tName + " (id:" + tId + ")");
+                    }
+                } else {
+                    if (logger.isDebugEnabled()) {
+                            logger.debug("Need to prepare db: " + dbName + " for Repo: " + repoDomainName
+                                            + " and tenant: " + tName + " (id:" + tId + ")");
+                    }
+                    boolean dbExists = JDBCTools.hasDatabase(dbType, dbName);
+                    if (dbExists) {
+                        if (logger.isDebugEnabled()) {
+                                logger.debug("Database: " + dbName + " already exists.");
                         }
-                } // Loop on repos for tenant
+                    } else {
+                        // Create the user as needed
+                        JDBCTools.createNewDatabaseUser(JDBCTools.CSADMIN_DATASOURCE_NAME, repositoryName, cspaceInstanceId, dbType, nuxeoUser, nuxeoPW);
+                        if (readerUser != null) {
+                            JDBCTools.createNewDatabaseUser(JDBCTools.CSADMIN_DATASOURCE_NAME, repositoryName, cspaceInstanceId, dbType, readerUser, readerPW);
+                        }
+                        // Create the database
+                        createDatabaseWithRights(dbType, dbName, nuxeoUser, nuxeoPW, readerUser, readerPW);
+                    }
+                    nuxeoDBsChecked.add(dbName);
+                }
+            } // Loop on repos for tenant
         } // Loop on tenants
                 
         return nuxeoDBsChecked;
@@ -721,7 +772,7 @@ public class ServiceMain {
             serverRootDir = "."; //assume server is started from server root, e.g. server/cspace
             String msg = String.format("System property '%s' was not set.  Using '%s' instead.",
             		SERVER_HOME_PROPERTY, serverRootDir);
-            logger.warn(msg);
+            mirrorToStdOut(msg);
         }
     }
 
@@ -754,6 +805,14 @@ public class ServiceMain {
         return tenantBindingConfigReader;
     }
     
+    public ResourceMap getJaxRSResourceMap() {
+        ResourceMap result;
+        
+        result = ResteasyProviderFactory.getContextData(ResourceMap.class);
+        
+        return result;
+    }
+    
     /**
      *  Populate a registry of URI templates by querying each resource
      *  for its own entries in the registry.
@@ -763,15 +822,15 @@ public class ServiceMain {
      */
     private synchronized void populateUriTemplateRegistry() {
        if (uriTemplateRegistry.isEmpty()) {
-            NuxeoBasedResource resource = null;
-            ResourceMap resourceMap = ResteasyProviderFactory.getContextData(ResourceMap.class);
-            for (Map.Entry<String, NuxeoBasedResource> entry : resourceMap.entrySet()) {
+    	   CollectionSpaceResource resource = null;
+            ResourceMap resourceMap = getJaxRSResourceMap();
+            Set<Map.Entry<String, CollectionSpaceResource>> entrySet = resourceMap.entrySet();
+            for (Map.Entry<String, CollectionSpaceResource> entry : entrySet) {
                 resource = entry.getValue();
                 Map<UriTemplateRegistryKey, StoredValuesUriTemplate> entries =
                         resource.getUriRegistryEntries();
                 uriTemplateRegistry.putAll(entries);
             }
-
             // FIXME: Contacts itself should not have an entry in the URI template registry;
             // there should be a Contacts entry in that registry only for use in
             // building URIs for resources that have contacts as a sub-resource
@@ -1155,79 +1214,91 @@ public class ServiceMain {
      * 
      * @param dbInitializationScriptFilePath
      * @param dbsCheckedOrCreated 
+     * @throws Exception 
      */
-    private void updateInitializationScript(String dbInitializationScriptFilePath,
-            HashSet<String> dbsCheckedOrCreated, String[] dataSourceNames) {
-        // Get the current copy of the Nuxeo databases initialization script file,
-        // if that file exists, and read all of its lines except for those which
-        // drop databases.
-        List<String> lines = null;
-        // "If the given string" for the pathname provided here "is the empty string, then the
-        // result is the empty abstract pathname," according to Oracle's Javadoc for File.
-        // An empty path string might be provided here if a call to get the database product name failed earlier.
-        File nuxeoDatabasesInitScriptFile = new File(dbInitializationScriptFilePath);
-        try {
-            if (! nuxeoDatabasesInitScriptFile.canRead()) {
-                String msg = String.format("Could not find and/or read the Nuxeo databases initialization script file '%s'",
-                        nuxeoDatabasesInitScriptFile.getCanonicalPath());
-                logger.warn(msg);
-            } else {
-                // Note: Exceptions are written only to the console, not thrown, by
-                // the readFileAsLines() method in the common-api package.
-                lines = FileTools.readFileAsLines(dbInitializationScriptFilePath);
-                Iterator<String> linesIterator = lines.iterator();
-                String currentLine;
-                while (linesIterator.hasNext()) {
-                    currentLine = linesIterator.next();
-                    // Elide all existing DROP DATABASE statements.
-                    if (currentLine.toLowerCase().contains(DROP_DATABASE_SQL_CMD.toLowerCase())) {
-                        linesIterator.remove();
-                    }
-                    // Elide a comment pertaining to the existing
-                    // DROP DATABASE statements.
-                    if (currentLine.toLowerCase().contains(DROP_OBJECTS_SQL_COMMENT.toLowerCase())) {
-                        linesIterator.remove();
-                    }
-                    // Elide all existing DROP USER statements.
-                    if (currentLine.toLowerCase().contains(DROP_USER_SQL_CMD.toLowerCase())) {
-                        linesIterator.remove();
-                    }
-                }
-            }
-            List<String> replacementLines = new ArrayList<String>();
-            // Add back the comment elided above
-            replacementLines.add(DROP_OBJECTS_SQL_COMMENT);
-            // Add new DROP DATABASE lines for every Nuxeo-managed database.
-            for (String dbName : dbsCheckedOrCreated) {
-              if (Tools.notBlank(dbName)) {
-                  replacementLines.add(String.format(DROP_DATABASE_IF_EXISTS_SQL_CMD, dbName));
-              }
-            }
-            // Add new DROP USER commands for every provided datasource.
-            String username;
-            for (String dataSourceName : dataSourceNames) {
-                username = getBasicDataSourceUsername(dataSourceName);
-                if (Tools.notBlank(username)) {
-                    replacementLines.add(String.format(DROP_USER_IF_EXISTS_SQL_CMD, username));
-                }
-            }
-            // Now append all existing lines from that file, except for
-            // any lines that were elided above.
-            if (lines != null && ! lines.isEmpty()) {
-                replacementLines.addAll(lines);
-            }
-            if (! nuxeoDatabasesInitScriptFile.canWrite()) {
-                String msg = String.format("Could not find and/or write the Nuxeo databases initialization script file '%s'",
-                        nuxeoDatabasesInitScriptFile.getCanonicalPath());
-                logger.warn(msg);
-            } else {
-                // Note: Exceptions are written only to the console, not thrown, by
-                // the writeFileFromLines() method in the common-api package.
-                FileTools.writeFileFromLines(dbInitializationScriptFilePath, replacementLines);
-            }
-        } catch (Exception e) {
+    private void updateInitializationScript(String dbInitializationScriptFilePath, HashSet<String> dbsCheckedOrCreated,
+			String[] dataSourceNames) throws Exception {
+    	//
+    	// Get the current copy of the Nuxeo databases initialization script
+		// file and read all of its lines except for those which DROP databases.
+		//
+    	File nuxeoDatabasesInitScriptFile = new File(dbInitializationScriptFilePath);
+		List<String> lines = null;
+		try {
+			if (!nuxeoDatabasesInitScriptFile.canRead()) {
+				String msg = String.format("Could not find and/or read the Nuxeo databases initialization script file '%s'",
+						nuxeoDatabasesInitScriptFile.getCanonicalPath());
+				logger.warn(msg);
+			} else {
+				//
+				// Make a backup of the existing file
+				String destFileName = String.format("%s.%s.bak", dbInitializationScriptFilePath, System.currentTimeMillis());
+				if (FileTools.copyFile(dbInitializationScriptFilePath, destFileName, false) == false) {
+					throw new Exception("Could not backup existing database initialization script.");
+				}
 
-        }
+				//
+				// Process the existing lines
+				lines = FileTools.readFileAsLines(dbInitializationScriptFilePath);
+				Iterator<String> linesIterator = lines.iterator();
+				String currentLine;
+				while (linesIterator.hasNext()) {
+					currentLine = linesIterator.next();
+					// Elide all existing DROP DATABASE statements.
+					if (currentLine.toLowerCase().contains(DROP_DATABASE_SQL_CMD.toLowerCase())) {
+						linesIterator.remove();
+					}
+					// Elide a comment pertaining to the existing
+					// DROP DATABASE statements.
+					if (currentLine.toLowerCase().contains(DROP_OBJECTS_SQL_COMMENT.toLowerCase())) {
+						linesIterator.remove();
+					}
+					// Elide all existing DROP USER statements.
+					if (currentLine.toLowerCase().contains(DROP_USER_SQL_CMD.toLowerCase())) {
+						linesIterator.remove();
+					}
+				}
+			}
+			
+			// Add back the comment elided above
+			List<String> replacementLines = new ArrayList<String>();
+			replacementLines.add(DROP_OBJECTS_SQL_COMMENT);
+			// Add new DROP DATABASE lines for every Nuxeo-managed database.
+			for (String dbName : dbsCheckedOrCreated) {
+				if (Tools.notBlank(dbName)) {
+					replacementLines.add(String.format(DROP_DATABASE_IF_EXISTS_SQL_CMD, dbName));
+				}
+			}
+			
+			// Add new DROP USER commands for every provided datasource.
+			String username;
+			for (String dataSourceName : dataSourceNames) {
+				username = getBasicDataSourceUsername(dataSourceName);
+				if (Tools.notBlank(username)) {
+					replacementLines.add(String.format(DROP_USER_IF_EXISTS_SQL_CMD, username));
+				}
+			}
+			
+			// Now append all existing lines from that file, except for
+			// any lines that were elided above.
+			if (lines != null && !lines.isEmpty()) {
+				replacementLines.addAll(lines);
+			}
+			
+			if (!nuxeoDatabasesInitScriptFile.canWrite()) {
+				String msg = String.format(
+						"Could not find and/or write the Nuxeo databases initialization script file '%s'",
+						nuxeoDatabasesInitScriptFile.getCanonicalPath());
+				logger.warn(msg);
+			} else {
+				// Note: Exceptions are written only to the console, not thrown, by
+				// the writeFileFromLines() method in the common-api package.
+				FileTools.writeFileFromLines(dbInitializationScriptFilePath, replacementLines);
+			}
+		} catch (Exception e) {
+			logger.error("Could not update database initialization script.", e);
+			throw e;
+		}
 
-    }
+	}
 }

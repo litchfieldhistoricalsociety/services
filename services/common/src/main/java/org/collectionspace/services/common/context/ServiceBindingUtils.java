@@ -34,8 +34,10 @@ public class ServiceBindingUtils {
 	public static final String SERVICE_TYPE_OBJECT = "object";
 	public static final String SERVICE_TYPE_PROCEDURE = "procedure";
 	public static final String SERVICE_TYPE_AUTHORITY = "authority";
+	public static final String SERVICE_TYPE_VOCABULARY = "vocabulary";
 	public static final String SERVICE_TYPE_UTILITY = "utility";
 	public static final String SERVICE_TYPE_SECURITY = "security";
+	public static final String SERVICE_COMMONPART_ID = "1";
 	
 	private static final String TENANT_EXTENSION_PATTERN = "(.*)"+ServiceContext.TENANT_SUFFIX+"[\\d]+$";
 	private static final String TENANT_REPLACEMENT_PATTERN = "$1";

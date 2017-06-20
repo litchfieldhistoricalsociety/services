@@ -3,7 +3,7 @@
     <parent>
         <groupId>org.collectionspace.services</groupId>
         <artifactId>org.collectionspace.services</artifactId>
-        <version>4.3</version>
+        <version>4.4</version>
     </parent>
 
     <modelVersion>4.0.0</modelVersion>
@@ -64,6 +64,7 @@
         <module>loanout</module>
         <module>exhibition</module>
         <module>conditioncheck</module>
+        <module>conservation</module>
         <module>valuationcontrol</module>
         <module>objectexit</module>
         <module>batch</module>
@@ -71,6 +72,7 @@
         <module>location</module>
         <module>place</module>
         <module>work</module>
+        <module>material</module>
         <module>concept</module>
         <module>taxonomy</module>
         <module>movement</module>
@@ -78,6 +80,7 @@
         <module>dimension</module>
         <module>contact</module>
         <module>workflow</module>
+        <module>index</module>
         <module>media</module>
         <module>publicitem</module>        
         <!--module>sdk</module-->

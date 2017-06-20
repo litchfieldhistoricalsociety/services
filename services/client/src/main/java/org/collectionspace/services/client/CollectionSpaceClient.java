@@ -23,10 +23,12 @@
  */
 package org.collectionspace.services.client;
 
+import java.util.Properties;
+
 import javax.ws.rs.core.Response;
+
 import org.apache.commons.httpclient.HttpClient;
-import org.jboss.resteasy.client.ClientResponse;
-import org.collectionspace.services.common.authorityref.AuthorityRefList;
+import org.collectionspace.services.description.ServiceDescription;
 
 /**
  *	LT - List Type
@@ -39,6 +41,7 @@ public interface CollectionSpaceClient<CLT, REQUEST_TYPE, RESPONSE_TYPE, P exten
 	public final static String CSID_PATH_PARAM_VAR = "{csid}";
     public final static String COLLECTIONSPACE_CORE_SCHEMA = "collectionspace_core";
     
+    public final static String COLLECTIONSPACE_CORE_CSID = "csid";
     public final static String COLLECTIONSPACE_CORE_TENANTID = "tenantId";
     public final static String CORE_TENANTID = COLLECTIONSPACE_CORE_SCHEMA + ":" + COLLECTIONSPACE_CORE_TENANTID;
     
@@ -63,12 +66,19 @@ public interface CollectionSpaceClient<CLT, REQUEST_TYPE, RESPONSE_TYPE, P exten
     public final static String COLLECTIONSPACE_CORE_WORKFLOWSTATE = "workflowState";
     public final static String CORE_WORKFLOWSTATE = COLLECTIONSPACE_CORE_SCHEMA + ":" + COLLECTIONSPACE_CORE_WORKFLOWSTATE;
     
-    public static final String AUTH_PROPERTY = "cspace.auth";
-    public static final String PASSWORD_PROPERTY = "cspace.password";
-    public static final String SSL_PROPERTY = "cspace.ssl";
+    public static final String DEFAULT_CLIENT_PROPERTIES_FILENAME = "collectionspace-client.properties";
+    public static final String SAS_CLIENT_PROPERTIES_FILENAME = "sas-collectionspace-client.properties";
+
     public static final String URL_PROPERTY = "cspace.url";
     public static final String USER_PROPERTY = "cspace.user";
-    public static final String TENANT_PROPERTY = "cspace.tenant";
+    public static final String PASSWORD_PROPERTY = "cspace.password";
+    public static final String SSL_PROPERTY = "cspace.ssl";
+    public static final String AUTH_PROPERTY = "cspace.auth";
+    public static final String TENANT_NAME_PROPERTY = "cspace.tenant";
+    public static final String TENANT_ID_PROPERTY = "cspace.tenantID";
+    
+    // JAX-RS path for getting service description meta information
+	public static final String SERVICE_DESCRIPTION_PATH = "description";
 
     /**
      * Gets the proxy.
@@ -132,15 +142,17 @@ public interface CollectionSpaceClient<CLT, REQUEST_TYPE, RESPONSE_TYPE, P exten
      * PASSWORD_PROPERTY
      * AUTH_PROPERTY
      * SSL_PROPERTY
+     * @throws Exception 
      */
-    void setupHttpClient();
+    void setupHttpClient() throws Exception;
 
     /**
      * setProxy for the client
      * might be useful to reset proxy (based on auth requirements) that is usually created at the time of
      * constructing a client
+     * @throws Exception 
      */
-    void setProxy();
+    void setProxy() throws Exception;
 
     /**
      * setAuth sets up authentication properties based on given parameters
@@ -149,10 +161,11 @@ public interface CollectionSpaceClient<CLT, REQUEST_TYPE, RESPONSE_TYPE, P exten
      * @param useUser indicates using user name
      * @param password
      * @param usePassword indicates using password
+     * @throws Exception 
      */
     void setAuth(boolean useAuth,
             String user, boolean useUser,
-            String password, boolean usePassword);
+            String password, boolean usePassword) throws Exception;
 
     /**
      * Use auth.
@@ -178,6 +191,8 @@ public interface CollectionSpaceClient<CLT, REQUEST_TYPE, RESPONSE_TYPE, P exten
      * Common proxied service calls
      */
 
+    public ServiceDescription getServiceDescription();
+    
 	public Response create(REQUEST_TYPE payload);
 	
 	public Response read(String csid);
@@ -235,4 +250,16 @@ public interface CollectionSpaceClient<CLT, REQUEST_TYPE, RESPONSE_TYPE, P exten
      * @return the client response
      */
     public Response delete(String csid);
+
+    /**
+     * Uses a properties files to set the url and credentials for an HTTP connection.
+     * 
+     * @param clientPropertiesFilename
+     * @throws Exception 
+     */
+	public void setClientProperties(String clientPropertiesFilename) throws Exception;
+	
+	public void setClientProperties(Properties clientProperties) throws Exception;
+	
+	public String getTenantName();
 }

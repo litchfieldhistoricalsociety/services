@@ -24,10 +24,13 @@ package org.collectionspace.services.authorization.client.test;
 
 //import java.util.ArrayList;
 import java.util.List;
+
 import javax.ws.rs.core.Response;
+
+
+
 //import org.collectionspace.services.authorization.ActionType;
 import org.collectionspace.services.authorization.perms.EffectType;
-
 import org.collectionspace.services.client.CollectionSpaceClient;
 import org.collectionspace.services.client.PermissionClient;
 import org.collectionspace.services.authorization.perms.Permission;
@@ -35,11 +38,8 @@ import org.collectionspace.services.authorization.perms.PermissionAction;
 import org.collectionspace.services.authorization.perms.PermissionsList;
 import org.collectionspace.services.client.PermissionFactory;
 import org.collectionspace.services.client.test.AbstractServiceTestImpl;
-import org.collectionspace.services.client.test.ServiceRequestType;
-
 import org.testng.Assert;
 import org.testng.annotations.Test;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -77,9 +77,14 @@ public class PermissionServiceTest extends AbstractServiceTestImpl<PermissionsLi
      * @see org.collectionspace.services.client.test.BaseServiceTest#getClientInstance()
      */
     @Override
-    protected CollectionSpaceClient getClientInstance() {
+    protected CollectionSpaceClient getClientInstance() throws Exception {
         return new PermissionClient();
     }
+
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) throws Exception {
+        return new PermissionClient(clientPropertiesFilename);
+	}
 
     /**
      * The entity type expected from the JAX-RS Response object

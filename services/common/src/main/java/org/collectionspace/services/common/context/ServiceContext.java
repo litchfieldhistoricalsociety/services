@@ -29,6 +29,10 @@ import java.util.Map;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.UriInfo;
 
+import org.collectionspace.services.client.CollectionSpaceClient;
+import org.collectionspace.services.client.PoxPayloadIn;
+import org.collectionspace.services.client.PoxPayloadOut;
+import org.collectionspace.services.common.CollectionSpaceResource;
 import org.collectionspace.services.common.ResourceMap;
 import org.collectionspace.services.common.document.DocumentHandler;
 import org.collectionspace.services.common.document.ValidatorHandler;
@@ -36,6 +40,7 @@ import org.collectionspace.services.common.security.SecurityContext;
 import org.collectionspace.services.config.ClientType;
 import org.collectionspace.services.config.service.ObjectPartType;
 import org.collectionspace.services.config.service.ServiceBindingType;
+import org.collectionspace.services.config.tenant.RemoteClientConfig;
 import org.collectionspace.services.config.tenant.RepositoryDomainType;
 
 /**
@@ -351,6 +356,25 @@ public interface ServiceContext<IT, OT> {
 	public RepositoryDomainType getRepositoryDomain();
 
 	public void setRepositoryDomain(RepositoryDomainType repositoryDomain);
+
+	public CollectionSpaceClient getClient() throws Exception;
+	
+	public CollectionSpaceClient getClient(String clientProperitesFilename) throws Exception;
+	
+	public CollectionSpaceClient getClient(RemoteClientConfig remoteClientConfig) throws Exception;
+
+    /**
+     * @return the JAX-RS resource of service for the current context.
+     * @throws Exception 
+     */
+    public CollectionSpaceResource<IT, OT> getResource() throws Exception;
+
+    /**
+     * @return the JAX-RS resource of service for the current context.
+     * @throws Exception 
+     */
+	public CollectionSpaceResource<IT, OT> getResource(
+			String serviceName) throws Exception;
 }
 
 

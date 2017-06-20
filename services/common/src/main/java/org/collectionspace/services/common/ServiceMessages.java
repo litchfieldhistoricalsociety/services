@@ -42,6 +42,7 @@ public class ServiceMessages {
     
     public static final String CREATE_FAILED = "Create request " + FAILED;
     public static final String READ_FAILED = "Read request " + FAILED;
+    public static final String REINDEX_FAILED = "Reindex request " + FAILED;
     public static final String UPDATE_FAILED = "Update request " + FAILED;
     
     public static final String POST_UNSUPPORTED = "POST " + UNSUPPORTED;
@@ -59,9 +60,18 @@ public class ServiceMessages {
     public static final String VALIDATION_FAILURE = "Validation failure ";
     public static final String MISSING_CSID = "missing csid";
     public static final String MISSING_INVALID_CSID = "missing/invalid csid=";
+	public static final String SYNC_FAILED = "Synchonization failed: ";
 
     public static String resourceNotFoundMsg(String csid) {
-        return "resource identified by CSID '" + csid + "' was not found.";
+        return String.format("The resource identified by CSID '%s' was not found.", csid);
     }
+
+    public static String resourceNotReindexedMsg(String csid) {
+        return String.format("The resource identified by CSID '%s' could not be reindexed. See the service logs for details.", csid);
+    }
+    
+    public static String resourceTypeNotReindexedMsg(String resourceType) {
+        return String.format("The resource types identified by '%s' could not be reindexed. See the service logs for details.", resourceType);
+    }    
 
 }

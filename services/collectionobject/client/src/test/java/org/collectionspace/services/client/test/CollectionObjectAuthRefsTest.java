@@ -55,13 +55,9 @@ import org.collectionspace.services.collectionobject.TitleGroupList;
 import org.collectionspace.services.jaxb.AbstractCommonList;
 import org.collectionspace.services.organization.OrgTermGroup;
 import org.collectionspace.services.person.PersonTermGroup;
-
-import org.jboss.resteasy.client.ClientResponse;
-
 import org.testng.Assert;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.Test;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,6 +74,11 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest<AbstractCommon
     protected CollectionSpaceClient getClientInstance() {
     	throw new UnsupportedOperationException(); //FIXME: REM - See http://issues.collectionspace.org/browse/CSPACE-3498
     }
+
+	@Override
+	protected CollectionSpaceClient getClientInstance(String clientPropertiesFilename) {
+    	throw new UnsupportedOperationException(); //FIXME: REM - See http://issues.collectionspace.org/browse/CSPACE-3498
+	}
     
 	@Override
 	protected String getServiceName() {
@@ -218,8 +219,9 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest<AbstractCommon
      *
      * @param displayName the display name of the authority
      * @param shortIdentifier the short identifier for the authority
+     * @throws Exception 
      */
-    private void createPersonAuthority(String displayName, String shortIdentifier) {
+    private void createPersonAuthority(String displayName, String shortIdentifier) throws Exception {
         testSetup(STATUS_CREATED, ServiceRequestType.CREATE);
         PersonAuthorityClient personAuthClient = new PersonAuthorityClient();
     	PoxPayloadOut multipart = PersonAuthorityClientUtils.createPersonAuthorityInstance(
@@ -244,8 +246,9 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest<AbstractCommon
      * @param surName the person's surname
      * @param shortIdentifier the short identifier for the item
      * @return the CSID of the newly-created person record
+     * @throws Exception 
      */
-    protected String createPerson(String firstName, String surName, String shortIdentifier ) {
+    protected String createPerson(String firstName, String surName, String shortIdentifier ) throws Exception {
     	String result = null;
     	
         Map<String, String> personInfo = new HashMap<String,String>();
@@ -279,8 +282,9 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest<AbstractCommon
     /**
      * Creates multiple Person items within a Person Authority,
      * and stores the refNames referring to each.
+     * @throws Exception 
      */
-    protected void createPersonRefs(){
+    protected void createPersonRefs() throws Exception{
 
         createPersonAuthority(PERSON_AUTHORITY_NAME_DISPLAY, PERSON_AUTHORITY_NAME);
 
@@ -328,8 +332,9 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest<AbstractCommon
      *
      * @param displayName the display name of the authority
      * @param shortIdentifier the short identifier for the authority
+     * @throws Exception 
      */
-    private void createOrgAuthority(String displayName, String shortIdentifier) {
+    private void createOrgAuthority(String displayName, String shortIdentifier) throws Exception {
         testSetup(STATUS_CREATED, ServiceRequestType.CREATE);
         OrgAuthorityClient orgAuthClient = new OrgAuthorityClient();
         PoxPayloadOut multipart = OrgAuthorityClientUtils.createOrgAuthorityInstance(
@@ -355,8 +360,9 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest<AbstractCommon
      * @param foundingPlace the organization's founding place
      * @param shortIdentifier the short identifier for the item
      * @return the CSID of the newly-created organization record
+     * @throws Exception 
      */
-    protected String createOrganization(String shortName, String foundingPlace, String shortIdentifier ) {
+    protected String createOrganization(String shortName, String foundingPlace, String shortIdentifier ) throws Exception {
     	String result = null;
     	
         Map<String, String> orgInfo = new HashMap<String,String>();
@@ -390,13 +396,11 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest<AbstractCommon
    /**
      * Creates multiple Organization items within an Organization Authority,
      * and stores the refNames referring to each.
+ * @throws Exception 
      */
-    private void createOrganizationRefs() {
-
+    private void createOrganizationRefs() throws Exception {
         createOrgAuthority(ORG_AUTHORITY_NAME, ORG_AUTHORITY_NAME);
-
         String csid = "";
-
         csid = createOrganization("Content Org", "Content Org Town", "contentOrg");
         contentOrganizationRefName = OrgAuthorityClientUtils.getOrgRefName(orgAuthCSID, csid, null);
         orgIdsCreated.add(csid);
@@ -508,9 +512,10 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest<AbstractCommon
      * For this reason, it attempts to remove all resources created
      * at any point during testing, even if some of those resources
      * may be expected to be deleted by certain tests.
+     * @throws Exception 
      */
     @AfterClass(alwaysRun=true)
-    public void cleanUp() {
+    public void cleanUp() throws Exception {
         String noTest = System.getProperty("noTestCleanup");
     	if(Boolean.TRUE.toString().equalsIgnoreCase(noTest)) {
             if (logger.isDebugEnabled()) {
@@ -565,6 +570,7 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest<AbstractCommon
     * @param contentPerson the content person
     * @param inscriber the inscriber
     * @return the multipart output
+ * @throws Exception 
     */
    private PoxPayloadOut createCollectionObjectInstance(
                 String title,
@@ -575,7 +581,7 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest<AbstractCommon
                 String assocEventPerson,
                 String owner,
                 String fieldCollectionSource,
-                String fieldCollector ) {
+                String fieldCollector ) throws Exception {
         CollectionobjectsCommon collectionObject = new CollectionobjectsCommon();
         TitleGroupList titleGroupList = new TitleGroupList();
         List<TitleGroup> titleGroups = titleGroupList.getTitleGroup();
@@ -642,5 +648,4 @@ public class CollectionObjectAuthRefsTest extends BaseServiceTest<AbstractCommon
 
         return multipart;
     }
-
 }
